@@ -43,7 +43,7 @@ if not os.path.exists(".env/config.ini"):
         os.mkdir(".env")
     with open(".env/config.ini", 'w') as f:
         config.write(f)
-
+print (sys.version)
 config.read(os.path.join('.env', 'config.ini'))
 DEST_PATH = config['custom']['DEST_PATH']
 TMP_PATH = config['custom']['TMP_PATH']
@@ -76,6 +76,12 @@ swaggerCodeGen_config_all = {
         "projectName": "community-digikey-api-batchproductdetails",
         "packageVersion": "0.1.0",
     }
+    , 'supply-chain': {
+        "packageName": "digikey.v3.ordersupport",
+        "projectName": "community-digikey-api-supplychain",
+        "packageVersion": "0.1.0",
+    }
+
 }
 
 digikeyAPIdef_all = {
@@ -96,6 +102,12 @@ digikeyAPIdef_all = {
              , apiSubGroup='batchproductdetailsapi'
              , apiQuery='batchproductdetails'
              , urlNode='682'
+             )
+    , 'supply-chain':
+        dict(apiGroup='supply-chain'
+             , apiSubGroup='supplychain'
+             , apiQuery='getallproducts'
+             , urlNode='646'
              )
 }
 
@@ -149,14 +161,14 @@ def codeGen_api(digikeyAPIdef, swaggerCodeGen_config):
 
     # check if the swagger-codgen is present, else download
     if os.path.isfile(os.path.join(TMP_PATH, swagger_codegen_cli_version_jar)):
-        logging.info(f"Swagger-CodeGen: {swagger_codegen_cli_version_jar} already exists, no download required")
+        logging.info("Swagger-CodeGen: {swagger_codegen_cli_version_jar} already exists, no download required")
     else:
         try:
             url = swaggerCodeGenURL
             wget(os.path.join(TMP_PATH, swagger_codegen_cli_version_jar), url)
-            logging.info(f"Swagger-CodeGen : {swagger_codegen_cli_version_jar} downloaded from: {url}")
+            logging.info("Swagger-CodeGen : {swagger_codegen_cli_version_jar} downloaded from: {url}")
         except Exception as e:
-            logging.critical(f"Unable to download swaggerCodegen from {url} :exception: {e}")
+            logging.critical("Unable to download swaggerCodegen from {url} :exception: {e}")
 
     # execute swagger-codegen
     # Check Java is installed
@@ -181,10 +193,10 @@ def codeGen_api(digikeyAPIdef, swaggerCodeGen_config):
 
     try:
         logging.info(
-            f"STARTING Code generator:{swagger_codegen_cli_version_jar} for a Swagger API created, project name: {swaggerCodeGen_config['projectName']}")
+            "STARTING Code generator:{swagger_codegen_cli_version_jar} for a Swagger API created, project name: {swaggerCodeGen_config['projectName']}")
         procCall = subprocess.run(codeGenRunCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # , shell=True)
         logging.info(
-            f"COMPLETED Code generator for a Swagger API created, project name: {swaggerCodeGen_config['projectName']}")
+            "COMPLETED Code generator for a Swagger API created, project name: {swaggerCodeGen_config['projectName']}")
         logging.debug('----- STDOUT = \n{}'.format(procCall.stdout.decode('utf-8')))
         logging.debug('----- STDERR = \n{}'.format(procCall.stderr.decode('utf-8')))
         if procCall.returncode != 0:
@@ -278,7 +290,7 @@ def copy_generated_files():
 
 
 # Currently supported API's
-apiGenerateList = ['product-information', 'order-support', 'batch-product-details']
+apiGenerateList = ['product-information', 'order-support', 'batch-product-details', 'supply-chain']
 
 # Generate Digikey API python clients
 generated = [
