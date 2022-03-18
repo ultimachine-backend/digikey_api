@@ -8,6 +8,7 @@ from digikey.v3.productinformation import (KeywordSearchRequest, KeywordSearchRe
 from digikey.v3.productinformation.rest import ApiException
 from digikey.v3.ordersupport import (OrderStatusResponse, SalesOrderHistoryItem)
 from digikey.v3.batchproductdetails import (BatchProductDetailsRequest, BatchProductDetailsResponse)
+from digikey.v3.supplychain import (BondedInventoryProductResponse)
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,15 @@ class DigikeyApiWrapper(object):
         apinames = {
             digikey.v3.productinformation: 'Search',
             digikey.v3.ordersupport: 'OrderDetails',
-            digikey.v3.batchproductdetails: 'BatchSearch'
+            digikey.v3.batchproductdetails: 'BatchSearch',
+            digikey.v3.supplychain: 'SupplyChain'
         }
 
         apiclasses = {
             digikey.v3.productinformation: digikey.v3.productinformation.PartSearchApi,
             digikey.v3.ordersupport: digikey.v3.ordersupport.OrderDetailsApi,
-            digikey.v3.batchproductdetails: digikey.v3.batchproductdetails.BatchSearchApi
+            digikey.v3.batchproductdetails: digikey.v3.batchproductdetails.BatchSearchApi,
+            digikey.v3.supplychain: digikey.v3.supplychain.BondedInventoryApi
         }
 
         apiname = apinames[module]
@@ -40,7 +43,7 @@ class DigikeyApiWrapper(object):
             raise DigikeyError('Please provide a valid DIGIKEY_CLIENT_ID and DIGIKEY_CLIENT_SECRET in your env setup')
 
         # Use normal API by default, if DIGIKEY_CLIENT_SANDBOX is True use sandbox API
-        configuration.host = 'https://api.digikey.com/' + apiname + '/v3'
+        #configuration.host = 'https://api.digikey.com/' + apiname + '/v3'
         try:
             if bool(strtobool(os.getenv('DIGIKEY_CLIENT_SANDBOX'))):
                 configuration.host = 'https://sandbox-api.digikey.com/' + apiname + '/v3'
@@ -169,6 +172,10 @@ def salesorder_history(*args, **kwargs) -> [SalesOrderHistoryItem]:
     else:
         raise DigikeyError('Please provide valid start_date and end_date strings')
 
+def bonded_inventory(*args, **kwargs) -> [BondedInventoryProductResponse]:
+    client = DigikeyApiWrapper('get_all_products_with_http_info', digikey.v3.supplychain)
+    logger.info(f'Getting bonded items list')
+    return client.call_api_function(*args, **kwargs)
 
 def batch_product_details(*args, **kwargs) -> BatchProductDetailsResponse:
     client = DigikeyApiWrapper('batch_product_details_with_http_info', digikey.v3.batchproductdetails)

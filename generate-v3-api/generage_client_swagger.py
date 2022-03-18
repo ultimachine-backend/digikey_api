@@ -22,7 +22,6 @@ import configparser
 import shutil
 import zipfile, subprocess, shutil
 import sys, requests
-import git
 import json
 import re
 from pathlib import Path
@@ -36,6 +35,9 @@ config['custom'] = {
     )
     , 'TMP_PATH': os.path.realpath(os.path.expanduser(
         os.path.join(os.path.dirname(__file__), '..', '.tmp'))
+    )
+    , 'API_PATH': os.path.realpath(os.path.expanduser(
+        os.path.join(os.path.dirname(__file__), '..', 'digikey', 'v3'))
     )
 }
 if not os.path.exists(".env/config.ini"):
@@ -77,7 +79,7 @@ swaggerCodeGen_config_all = {
         "packageVersion": "0.1.0",
     }
     , 'supply-chain': {
-        "packageName": "digikey.v3.ordersupport",
+        "packageName": "digikey.v3.supplychain",
         "projectName": "community-digikey-api-supplychain",
         "packageVersion": "0.1.0",
     }
@@ -287,6 +289,14 @@ def copy_generated_files():
     shutil.copytree(
         Path(DEST_PATH).joinpath('community-digikey-api-batchproductdetails/digikey.v3.batchproductdetails'),
         Path(API_PATH).joinpath('batchproductdetails'), dirs_exist_ok=True)
+
+    logging.info('Copy generated supplychain files to api destination')
+    shutil.copytree(
+        Path(DEST_PATH).joinpath('community-digikey-api-supplychain/digikey/v3/supplychain'),
+        Path(API_PATH).joinpath('supplychain'), dirs_exist_ok=True)
+    shutil.copytree(
+        Path(DEST_PATH).joinpath('community-digikey-api-supplychain/digikey.v3.supplychain'),
+        Path(API_PATH).joinpath('supplychain'), dirs_exist_ok=True)
 
 
 # Currently supported API's

@@ -1,0 +1,618 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Supply Chain Api",
+        "description": "Provides ReST API operations for interacting with the Digi-Key Supply Chain services.",
+        "termsOfService": "https:\/\/www.digikey.com\/en\/terms-and-conditions",
+        "contact": {
+            "name": "API Support",
+            "url": "https:\/\/developer.digikey.com\/support",
+            "email": "api.support@digikey.com"
+        },
+        "version": "v1"
+    },
+    "host": "api.digikey.com",
+    "x-host-sandbox": "sandbox-api.digikey.com",
+    "x-host-production": "api.digikey.com",
+    "basePath": "\/SupplyChain\/v1",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "\/BondedQuantity\/Locations": {
+            "get": {
+                "tags": [
+                    "BondedInventory"
+                ],
+                "summary": "Returns the authorized locations",
+                "operationId": "GetLocations",
+                "produces": [
+                    "application\/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "OAuth Bearer Token. Please see<a href= \"https:\/\/developer.digikey.com\/documentation\/oauth\" target= \"_blank\" > OAuth 2.0 Documentation <\/a > page for more info.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "X-DIGIKEY-Client-Id",
+                        "description": "The Client Id for your App.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#\/definitions\/CustomerLocationResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - The request model is invalid or malformed",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token is expired or Client Id or subscription are invalid",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - The request is denied",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests - Your rate limit has been exceeded",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - The products were not found",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable - The service is temporarily unavailable",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "\/BondedQuantity\/Locations\/{customerId}": {
+            "get": {
+                "tags": [
+                    "BondedInventory"
+                ],
+                "summary": "Returns information for a specific location",
+                "operationId": "GetOneLocation",
+                "produces": [
+                    "application\/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "customerId",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "OAuth Bearer Token. Please see<a href= \"https:\/\/developer.digikey.com\/documentation\/oauth\" target= \"_blank\" > OAuth 2.0 Documentation <\/a > page for more info.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "X-DIGIKEY-Client-Id",
+                        "description": "The Client Id for your App.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#\/definitions\/CustomerLocationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - The request model is invalid or malformed",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token is expired or Client Id or subscription are invalid",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - The request is denied",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests - Your rate limit has been exceeded",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - The products were not found",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable - The service is temporarily unavailable",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "\/BondedQuantity\/Locations\/{customerId}\/Products": {
+            "get": {
+                "tags": [
+                    "BondedInventory"
+                ],
+                "summary": "Returns all the products with bonded inventory for specfic location",
+                "operationId": "GetLocationProducts",
+                "produces": [
+                    "application\/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "customerId",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "OAuth Bearer Token. Please see<a href= \"https:\/\/developer.digikey.com\/documentation\/oauth\" target= \"_blank\" > OAuth 2.0 Documentation <\/a > page for more info.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "X-DIGIKEY-Client-Id",
+                        "description": "The Client Id for your App.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#\/definitions\/BondedInventoryProductResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - The request model is invalid or malformed",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token is expired or Client Id or subscription are invalid",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - The request is denied",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests - Your rate limit has been exceeded",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - The products were not found",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable - The service is temporarily unavailable",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "\/BondedQuantity\/Locations\/{customerId}\/Products\/{partNumber}": {
+            "get": {
+                "tags": [
+                    "BondedInventory"
+                ],
+                "summary": "Returns Bonded Quantity for a specific part from a specific location",
+                "operationId": "GetProductbyPartNumber",
+                "produces": [
+                    "application\/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "customerId",
+                        "description": "Id of location",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "path",
+                        "name": "partNumber",
+                        "description": "",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "OAuth Bearer Token. Please see<a href= \"https:\/\/developer.digikey.com\/documentation\/oauth\" target= \"_blank\" > OAuth 2.0 Documentation <\/a > page for more info.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "X-DIGIKEY-Client-Id",
+                        "description": "The Client Id for your App.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#\/definitions\/BondedInventoryProductResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - The request model is invalid or malformed",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token is expired or Client Id or subscription are invalid",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - The request is denied",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests - Your rate limit has been exceeded",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable - The service is temporarily unavailable",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "\/BondedQuantity\/Products": {
+            "get": {
+                "tags": [
+                    "BondedInventory"
+                ],
+                "summary": "Returns all the products with bonded inventory for all authorized locations",
+                "operationId": "GetAllProducts",
+                "produces": [
+                    "application\/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "OAuth Bearer Token. Please see<a href= \"https:\/\/developer.digikey.com\/documentation\/oauth\" target= \"_blank\" > OAuth 2.0 Documentation <\/a > page for more info.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "X-DIGIKEY-Client-Id",
+                        "description": "The Client Id for your App.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#\/definitions\/BondedInventoryProductResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - The request model is invalid or malformed",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token is expired or Client Id or subscription are invalid",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - The request is denied",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests - Your rate limit has been exceeded",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - The products were not found",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable - The service is temporarily unavailable",
+                        "schema": {
+                            "$ref": "#\/definitions\/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "apiKeySecurity": {
+            "type": "apiKey",
+            "name": "X-DIGIKEY-Client-Id",
+            "in": "header"
+        },
+        "oauth2AccessCodeSecurity": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "https:\/\/api.digikey.com\/v1\/oauth2\/authorize",
+            "tokenUrl": "https:\/\/api.digikey.com\/v1\/oauth2\/token"
+        }
+    },
+    "security": [
+        {
+            "apiKeySecurity": [],
+            "oauth2AccessCodeSecurity": []
+        }
+    ],
+    "definitions": {
+        "Address": {
+            "description": "Company or Organization address",
+            "type": "object",
+            "properties": {
+                "company": {
+                    "description": "Company or Organization name",
+                    "type": "string",
+                    "example": "Universal Solutions"
+                },
+                "addressLineOne": {
+                    "description": "First line of address",
+                    "type": "string",
+                    "example": "Mailstop 15"
+                },
+                "addressLineTwo": {
+                    "description": "Second line of address",
+                    "type": "string",
+                    "example": "1000 Main Street"
+                },
+                "addressLineThree": {
+                    "description": "Third line of address",
+                    "type": "string",
+                    "example": "Suite 300"
+                },
+                "city": {
+                    "description": "City",
+                    "type": "string",
+                    "example": "Bloomington"
+                },
+                "province": {
+                    "description": "Province or State",
+                    "type": "string",
+                    "example": "MN"
+                },
+                "postalCode": {
+                    "description": "Postal Code or Zip Code",
+                    "type": "string",
+                    "example": "554250000"
+                },
+                "country": {
+                    "description": "Country 2 digit ISO code",
+                    "type": "string",
+                    "example": "US"
+                }
+            }
+        },
+        "ApiErrorResponse": {
+            "type": "object",
+            "properties": {
+                "statusCode": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "errorMessage": {
+                    "type": "string"
+                },
+                "errorDetails": {
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "string"
+                },
+                "validationErrors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#\/definitions\/ApiValidationError"
+                    }
+                }
+            }
+        },
+        "ApiValidationError": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "BondedInventoryProductResponse": {
+            "description": "Bonded Inventory response model",
+            "type": "object",
+            "properties": {
+                "digiKeyPartNumber": {
+                    "description": "The Digi-Key part number.",
+                    "type": "string",
+                    "example": "P5555-ND"
+                },
+                "manufacturerPartNumber": {
+                    "description": "The Manufacturer Part Number.",
+                    "type": "string",
+                    "example": "ECA-1VHG102"
+                },
+                "customerPartNumber": {
+                    "description": "The Customer Part Number.",
+                    "type": "string",
+                    "example": "ECA-1VHG102"
+                },
+                "productDescription": {
+                    "description": "Catalog description of the product.",
+                    "type": "string",
+                    "example": "CAP ALUM 1000UF 20% 35V RADIAL"
+                },
+                "manufacturer": {
+                    "description": "The Manufacturer of the product.",
+                    "type": "string",
+                    "example": "Panasonic Electronic Components"
+                },
+                "unitPrice": {
+                    "format": "double",
+                    "description": "The price for a single unit of this product.",
+                    "type": "number",
+                    "example": 0.13
+                },
+                "packType": {
+                    "description": "The Package Type of the product",
+                    "type": "string",
+                    "example": "50"
+                },
+                "countryOfOrigin": {
+                    "description": "The Country Of Origin of the product",
+                    "type": "string",
+                    "example": "US"
+                },
+                "reserveQuantity": {
+                    "format": "int32",
+                    "description": "The Reserve Quantity on backorder",
+                    "type": "integer",
+                    "example": 50
+                },
+                "backOrderReserveQuantity": {
+                    "format": "int32",
+                    "description": "The Reserve Quantity on backorder",
+                    "type": "integer",
+                    "example": 50
+                },
+                "vendorLeadWeeks": {
+                    "description": "The number of weeks lead time",
+                    "type": "string",
+                    "example": "12"
+                },
+                "customerId": {
+                    "format": "int32",
+                    "description": "The Customer Id that the bonded quantity is assigned to",
+                    "type": "integer"
+                }
+            }
+        },
+        "CustomerLocationResponse": {
+            "type": "object",
+            "properties": {
+                "customerId": {
+                    "format": "int32",
+                    "description": "The Id assigned to the location and customer",
+                    "type": "integer",
+                    "example": 123456789
+                },
+                "bondedInventory": {
+                    "description": "Does the location have bonded Inventory",
+                    "type": "boolean",
+                    "example": true
+                },
+                "currency": {
+                    "description": "ISO code for currency used in the order.",
+                    "type": "string",
+                    "example": "USD"
+                },
+                "shippingAddress": {
+                    "description": "Address for the shipping destination",
+                    "allOf": [
+                        {
+                            "$ref": "#\/definitions\/Address"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "tags": []
+}
