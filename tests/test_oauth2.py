@@ -31,7 +31,7 @@ def mock_open_new(url):
     values = {'code': 'MOCK_AUTH_CODE'}
     data = urllib.parse.urlencode(values)
     req = parsed['redirect_uri'][0] + '?' + data
-    threading.Thread(target=lambda: urllib.request.urlopen(req, context=ssl._create_unverified_context())).start()
+    threading.Thread(str(target=lambda: urllib.request.urlopen(req, context=ssl._create_unverified_context()))).start()
     pass
 
 
@@ -96,7 +96,7 @@ class Oauth2Tests(TestCase):
             # Test for correct storage
             token_json = None
             try:
-                with open(token_file, 'r') as f:
+                with open(str(token_file), 'r') as f:
                     token_json = json.load(f)
             except (EnvironmentError, JSONDecodeError):
                 print('Token storage does not exist or malformed')

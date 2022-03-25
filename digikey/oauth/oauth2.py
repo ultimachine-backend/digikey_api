@@ -215,7 +215,7 @@ class TokenHandler:
         return token_json
 
     def save(self, json_data):
-        with open(self._token_storage_path, 'w') as f:
+        with open(str(self._token_storage_path), 'w') as f:
             json.dump(json_data, f)
             logger.debug('Saved token to: {}'.format(self._token_storage_path))
 
@@ -231,7 +231,7 @@ class TokenHandler:
         # Check if a token already exists on the storage
         token_json = None
         try:
-            with open(self._token_storage_path, 'r') as f:
+            with open(str(self._token_storage_path), 'r') as f:
                 token_json = json.load(f)
         except (EnvironmentError, JSONDecodeError):
             logger.warning('Oauth2 token storage does not exist or malformed, creating new.')
