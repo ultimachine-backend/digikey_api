@@ -79,7 +79,7 @@ class DigikeyApiWrapper(object):
 
             logger.debug('Requests remaining: [{}/{}]'.format(rate_limit_rem, rate_limit))
         except (KeyError, ValueError) as e:
-            logger.debug(f'No api limits returned -> {e.__class__.__name__}: {e}')
+            logger.debug('No api limits returned -> {e.__class__.__name__}: {e}')
             if api_limits is not None and type(api_limits) == dict:
                 api_limits['api_requests_limit'] = None
                 api_limits['api_requests_remaining'] = None
@@ -98,14 +98,14 @@ class DigikeyApiWrapper(object):
             status = kwargs.pop('status', None)
 
             func = getattr(self._api_instance, self.wrapped_function)
-            logger.debug(f'CALL wrapped -> {func.__qualname__}')
+            logger.debug('CALL wrapped -> {func.__qualname__}')
             api_response = func(*args, self.authorization, self.x_digikey_client_id, **kwargs)
             self._remaining_requests(api_response[2], api_limits)
             self._store_api_statuscode(api_response[1], status)
 
             return api_response[0]
         except ApiException as e:
-            logger.error(f'Exception when calling {self.wrapped_function}: {e}')
+            logger.error('Exception when calling {self.wrapped_function}: {e}')
             self._store_api_statuscode(e.status, status)
 
 
@@ -113,7 +113,7 @@ def keyword_search(*args, **kwargs) -> KeywordSearchResponse:
     client = DigikeyApiWrapper('keyword_search_with_http_info', digikey.v3.productinformation)
 
     if 'body' in kwargs and type(kwargs['body']) == KeywordSearchRequest:
-        logger.info(f'Search for: {kwargs["body"].keywords}')
+        logger.info('Search for: {kwargs["body"].keywords}')
         logger.debug('CALL -> keyword_search')
         return client.call_api_function(*args, **kwargs)
     else:
@@ -124,7 +124,7 @@ def product_details(*args, **kwargs) -> ProductDetails:
     client = DigikeyApiWrapper('product_details_with_http_info', digikey.v3.productinformation)
 
     if len(args):
-        logger.info(f'Get product details for: {args[0]}')
+        logger.info('Get product details for: {args[0]}')
         return client.call_api_function(*args, **kwargs)
 
 
@@ -132,7 +132,7 @@ def digi_reel_pricing(*args, **kwargs) -> DigiReelPricing:
     client = DigikeyApiWrapper('digi_reel_pricing_with_http_info', digikey.v3.productinformation)
 
     if len(args):
-        logger.info(f'Calculate the DigiReel pricing for {args[0]} with quantity {args[1]}')
+        logger.info('Calculate the DigiReel pricing for {args[0]} with quantity {args[1]}')
         return client.call_api_function(*args, **kwargs)
 
 
@@ -140,7 +140,7 @@ def suggested_parts(*args, **kwargs) -> ProductDetails:
     client = DigikeyApiWrapper('suggested_parts_with_http_info', digikey.v3.productinformation)
 
     if len(args):
-        logger.info(f'Retrieve detailed product information and two suggested products for: {args[0]}')
+        logger.info('Retrieve detailed product information and two suggested products for: {args[0]}')
         return client.call_api_function(*args, **kwargs)
 
 
@@ -148,7 +148,7 @@ def manufacturer_product_details(*args, **kwargs) -> KeywordSearchResponse:
     client = DigikeyApiWrapper('manufacturer_product_details_with_http_info', digikey.v3.productinformation)
 
     if 'body' in kwargs and type(kwargs['body']) == ManufacturerProductDetailsRequest:
-        logger.info(f'Search for: {kwargs["body"].manufacturer_product}')
+        logger.info('Search for: {kwargs["body"].manufacturer_product}')
         return client.call_api_function(*args, **kwargs)
     else:
         raise DigikeyError('Please provide a valid ManufacturerProductDetailsRequest argument')
@@ -158,7 +158,7 @@ def status_salesorder_id(*args, **kwargs) -> OrderStatusResponse:
     client = DigikeyApiWrapper('order_status_with_http_info', digikey.v3.ordersupport)
 
     if len(args):
-        logger.info(f'Get order details for: {args[0]}')
+        logger.info('Get order details for: {args[0]}')
         return client.call_api_function(*args, **kwargs)
 
 
@@ -167,21 +167,21 @@ def salesorder_history(*args, **kwargs) -> [SalesOrderHistoryItem]:
 
     if 'start_date' in kwargs and type(kwargs['start_date']) == str \
             and 'end_date' in kwargs and type(kwargs['end_date']) == str:
-        logger.info(f'Searching for orders in date range ' + kwargs['start_date'] + ' to ' + kwargs['end_date'])
+        logger.info('Searching for orders in date range ' + kwargs['start_date'] + ' to ' + kwargs['end_date'])
         return client.call_api_function(*args, **kwargs)
     else:
         raise DigikeyError('Please provide valid start_date and end_date strings')
 
 def bonded_inventory(*args, **kwargs) -> [BondedInventoryProductResponse]:
     client = DigikeyApiWrapper('get_all_products_with_http_info', digikey.v3.supplychain)
-    logger.info(f'Getting bonded items list')
+    logger.info('Getting bonded items list')
     return client.call_api_function(*args, **kwargs)
 
 def batch_product_details(*args, **kwargs) -> BatchProductDetailsResponse:
     client = DigikeyApiWrapper('batch_product_details_with_http_info', digikey.v3.batchproductdetails)
 
     if 'body' in kwargs and type(kwargs['body']) == BatchProductDetailsRequest:
-        logger.info(f'Batch product search: {kwargs["body"].products}')
+        logger.info('Batch product search: {kwargs["body"].products}')
         logger.debug('CALL -> batch_product_details')
         return client.call_api_function(*args, **kwargs)
     else:

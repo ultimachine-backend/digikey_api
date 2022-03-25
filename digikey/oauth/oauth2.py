@@ -121,7 +121,7 @@ class TokenHandler:
         else:
             raise ValueError('Please specify the correct Digikey API version')
 
-        logger.debug(f'Using API V{version}')
+        logger.debug('Using API V{version}')
 
         a_id = a_id or os.getenv('DIGIKEY_CLIENT_ID')
         a_secret = a_secret or os.getenv('DIGIKEY_CLIENT_SECRET')
@@ -156,8 +156,8 @@ class TokenHandler:
                   'redirect_uri': REDIRECT_URI
                   }
         url = self.auth_url + '?' + urlencode(params)
-        logger.debug(f'AUTH - Authenticating with endpoint {self.auth_url} using ID: {self._id[:-5]}...')
-        logger.debug(f'AUTH - Redirect URL: {REDIRECT_URI}')
+        logger.debug('AUTH - Authenticating with endpoint {self.auth_url} using ID: {self._id[:-5]}...')
+        logger.debug('AUTH - Redirect URL: {REDIRECT_URI}')
         return url
 
     def __exchange_for_token(self, code):
@@ -172,16 +172,16 @@ class TokenHandler:
                      }
 
         try:
-            logger.debug(f'TOKEN - Exchanging {code} auth code for token at endpoint: {self.token_url}')
-            logger.debug(f'TOKEN - Using client id: {self._id[:-5]}...')
-            logger.debug(f'TOKEN - Using client secret: {self._secret[:-5]}...')
+            logger.debug('TOKEN - Exchanging {code} auth code for token at endpoint: {self.token_url}')
+            logger.debug('TOKEN - Using client id: {self._id[:-5]}...')
+            logger.debug('TOKEN - Using client secret: {self._secret[:-5]}...')
             r = requests.post(self.token_url, headers=headers, data=post_data)
             r.raise_for_status()
         except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
             raise DigikeyOauthException('TOKEN - Cannot request new token with auth code: {}'.format(e))
         else:
             token_json = r.json()
-            logger.debug(f'TOKEN - Got access token with value: {token_json["access_token"][:-5]}...')
+            logger.debug('TOKEN - Got access token with value: {token_json["access_token"][:-5]}...')
             logger.info('TOKEN - Successfully retrieved access token.')
 
         # Create epoch timestamp from expires in, with 1 minute margin
@@ -207,7 +207,7 @@ class TokenHandler:
             raise DigikeyOauthException('REFRESH - Cannot request new token with refresh token: {}.'.format(error_message))
         else:
             token_json = r.json()
-            logger.debug(f'REFRESH - Got access token with value: {token_json["access_token"]}')
+            logger.debug('REFRESH - Got access token with value: {token_json["access_token"]}')
             logger.info('REFRESH - Successfully retrieved access token.')
 
         # Create epoch timestamp from expires in, with 1 minute margin
@@ -243,7 +243,7 @@ class TokenHandler:
         # Try to refresh the credentials with the stores refresh token
         if token is not None and token.expired():
             try:
-                logger.debug(f'REFRESH - Current token is stale, refresh using: {token.refresh_token}')
+                logger.debug('REFRESH - Current token is stale, refresh using: {token.refresh_token}')
                 token_json = self.__refresh_token(token.refresh_token)
                 self.save(token_json)
             except DigikeyOauthException:
