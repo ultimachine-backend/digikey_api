@@ -9,7 +9,7 @@ from json.decoder import JSONDecodeError
 from pathlib import Path
 from urllib.parse import urlencode, urlparse, parse_qs
 from webbrowser import open_new
-
+from os.path import join
 import requests
 from certauth.certauth import CertificateAuthority
 
@@ -268,8 +268,9 @@ class TokenHandler:
 
             # Remove generated certificate
             try:
-                os.remove(Path(filename))
-                os.remove(self._ca_cert)
+                fn = join(os.getcwd(), filename)
+                os.remove(fn)
+                os.remove(str(self._ca_cert))
             except OSError as e:
                 logger.error('Cannot remove temporary certificates: {}'.format(e))
 
