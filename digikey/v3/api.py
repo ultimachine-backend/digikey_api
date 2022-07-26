@@ -162,15 +162,31 @@ def status_salesorder_id(*args, **kwargs) -> OrderStatusResponse:
         return client.call_api_function(*args, **kwargs)
 
 
+def get_access():
+    digikey_token = digikey.oauth.oauth2.TokenHandler(version=3).prefetch_access_token()
+    if not digikey_token:
+        return digikey.oauth.oauth2.TokenHandler(version=3).get_new_access_token_url()
+    return None
+
+def auth_server():
+    digikey_token = digikey.oauth.oauth2.TokenHandler(version=3).spawn_server()
+    
+
+def post_token(auth_code):
+    digikey_token = digikey.oauth.oauth2.TokenHandler(version=3).store_token(auth_code)
+    
+
 def salesorder_history(*args, **kwargs) -> [SalesOrderHistoryItem]:
     client = DigikeyApiWrapper('order_history_with_http_info', digikey.v3.ordersupport)
 
     if 'start_date' in kwargs and type(kwargs['start_date']) == str \
             and 'end_date' in kwargs and type(kwargs['end_date']) == str:
         logger.info('Searching for orders in date range ' + kwargs['start_date'] + ' to ' + kwargs['end_date'])
+#        return client.call_ulties_api_function(*args, **kwargs)
         return client.call_api_function(*args, **kwargs)
     else:
         raise DigikeyError('Please provide valid start_date and end_date strings')
+
 
 def bonded_inventory(*args, **kwargs) -> [BondedInventoryProductResponse]:
     client = DigikeyApiWrapper('get_all_products_with_http_info', digikey.v3.supplychain)

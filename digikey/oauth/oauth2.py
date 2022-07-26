@@ -12,6 +12,7 @@ from webbrowser import open_new
 from os.path import join
 import requests
 from certauth.certauth import CertificateAuthority
+import time
 
 from digikey.constants import USER_AGENT
 from digikey.exceptions import DigikeyOauthException
@@ -28,7 +29,7 @@ TOKEN_URL_V3_PROD = 'https://api.digikey.com/v1/oauth2/token'
 AUTH_URL_V3_SB = 'https://sandbox-api.digikey.com/v1/oauth2/authorize'
 TOKEN_URL_V3_SB = 'https://sandbox-api.digikey.com/v1/oauth2/token'
 
-REDIRECT_URI = 'https://localhost:8139/digikey_callback'
+REDIRECT_URI = 'https://localhost/digikey_callback'
 PORT = 8139
 
 logger = logging.getLogger(__name__)
@@ -279,5 +280,91 @@ class TokenHandler:
 
             # Save the newly obtained credentials to the filesystem
             self.save(token_json)
+
+        return Oauth2Token(token_json)
+
+
+    def prefetch_access_token(self) -> Oauth2Token:
+        """
+         Fetches the access key using an HTTP server to handle oAuth
+         requests
+            Args:
+                appId:      The assigned App ID
+                appSecret:  The assigned App Secret
+        """
+
+        # Check if a token already exists on the storage
+        token_json = None
+        try:
+            with open(str(self._token_storage_path), 'r') as f:
+                token_json = json.load(f)
+        except (EnvironmentError, JSONDecodeError):
+            logger.warning('Oauth2 token storage does not exist or malformed, creating new.')
+
+        token = None
+        if token_json is not None:
+            token = Oauth2Token(token_json)
+
+        # Try to refresh the credentials with the stores refresh token
+        if token is not None and token.expired():
+            try:
+                logger.debug('REFRESH - Current token is stale, refresh using: {token.refresh_token}')
+                token_json = self.__refresh_token(token.refresh_token)
+                self.save(token_json)
+            except DigikeyOauthException:
+                logger.error('REFRESH - Failed to use refresh token, starting new authorization flow.')
+                token_json = None
+
+        # Obtain new credentials using the Oauth flow if no token stored or refresh fails
+        if token_json is None:
+            return None
+        return Oauth2Token(token_json)
+
+    def get_new_access_token_url(self):
+        return(self.__build_authorization_url())
+    
+    
+    def spawn_server(self) -> Oauth2Token:
+        self.__build_authorization_url()
+        filename = self.__generate_certificate()
+        httpd = HTTPServer(
+                ('localhost', PORT),
+                lambda request, address, server: HTTPServerHandler(
+                    request, address, server, self._id, self._secret))
+        httpd.socket = ssl.wrap_socket(httpd.socket, certfile=str(Path(filename)), server_side=True)
+        httpd.stop = 0
+
+        # This function will block until it receives a request
+        timeout = time.time() + 60*2   # 5 minutes from now
+        handled = False
+        while time.time() < timeout and httpd.stop == 0:
+            httpd.handle_request()
+            if httpd.stop != 0:
+                handled = True
+        httpd.server_close()
+        if not handled:
+            return None
+
+        # Remove generated certificate
+        try:
+            fn = join(os.getcwd(), filename)
+            os.remove(fn)
+            os.remove(str(self._ca_cert))
+        except OSError as e:
+            logger.error('Cannot remove temporary certificates: {}'.format(e))
+        # Get the acccess token from the auth code
+        token_json = self.__exchange_for_token(httpd.auth_code)
+
+        # Save the newly obtained credentials to the filesystem
+        self.save(token_json)
+
+        return Oauth2Token(token_json)
+
+    def store_token(self, auth_code) -> Oauth2Token:
+        # Get the acccess token from the auth code
+        token_json = self.__exchange_for_token(auth_code)
+
+        # Save the newly obtained credentials to the filesystem
+        self.save(token_json)
 
         return Oauth2Token(token_json)
