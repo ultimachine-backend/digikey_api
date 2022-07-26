@@ -29,7 +29,7 @@ TOKEN_URL_V3_PROD = 'https://api.digikey.com/v1/oauth2/token'
 AUTH_URL_V3_SB = 'https://sandbox-api.digikey.com/v1/oauth2/authorize'
 TOKEN_URL_V3_SB = 'https://sandbox-api.digikey.com/v1/oauth2/token'
 
-REDIRECT_URI = 'https:///digikey_192.168.80.7/callback'
+REDIRECT_URI = 'https://192.168.80.7/callback'
 PORT = 8139
 
 logger = logging.getLogger(__name__)
