@@ -29,7 +29,7 @@ TOKEN_URL_V3_PROD = 'https://api.digikey.com/v1/oauth2/token'
 AUTH_URL_V3_SB = 'https://sandbox-api.digikey.com/v1/oauth2/authorize'
 TOKEN_URL_V3_SB = 'https://sandbox-api.digikey.com/v1/oauth2/token'
 
-REDIRECT_URI = 'https://192.168.80.7/callback'
+REDIRECT_URI = 'https://ulties.ultimachine.com/digikey_callback'
 PORT = 8139
 
 logger = logging.getLogger(__name__)
@@ -321,6 +321,7 @@ class TokenHandler:
         return Oauth2Token(token_json)
 
     def get_new_access_token_url(self):
+        filename = self.__generate_certificate()
         return(self.__build_authorization_url())
     
     
@@ -362,6 +363,8 @@ class TokenHandler:
 
     def store_token(self, auth_code) -> Oauth2Token:
         # Get the acccess token from the auth code
+        self.__build_authorization_url()
+        filename = self.__generate_certificate()
         token_json = self.__exchange_for_token(auth_code)
 
         # Save the newly obtained credentials to the filesystem
