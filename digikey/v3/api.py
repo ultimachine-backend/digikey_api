@@ -124,7 +124,7 @@ def product_details(*args, **kwargs) -> ProductDetails:
     client = DigikeyApiWrapper('product_details_with_http_info', digikey.v3.productinformation)
 
     if len(args):
-        logger.info('Get product details for: {args[0]}')
+        logger.info(f'Get product details for: {args[0]}')
         return client.call_api_function(*args, **kwargs)
 
 
@@ -132,7 +132,7 @@ def digi_reel_pricing(*args, **kwargs) -> DigiReelPricing:
     client = DigikeyApiWrapper('digi_reel_pricing_with_http_info', digikey.v3.productinformation)
 
     if len(args):
-        logger.info('Calculate the DigiReel pricing for {args[0]} with quantity {args[1]}')
+        logger.info(f'Calculate the DigiReel pricing for {args[0]} with quantity {args[1]}')
         return client.call_api_function(*args, **kwargs)
 
 
@@ -140,7 +140,7 @@ def suggested_parts(*args, **kwargs) -> ProductDetails:
     client = DigikeyApiWrapper('suggested_parts_with_http_info', digikey.v3.productinformation)
 
     if len(args):
-        logger.info('Retrieve detailed product information and two suggested products for: {args[0]}')
+        logger.info(f'Retrieve detailed product information and two suggested products for: {args[0]}')
         return client.call_api_function(*args, **kwargs)
 
 
@@ -158,7 +158,7 @@ def status_salesorder_id(*args, **kwargs) -> OrderStatusResponse:
     client = DigikeyApiWrapper('order_status_with_http_info', digikey.v3.ordersupport)
 
     if len(args):
-        logger.info('Get order details for: {args[0]}')
+        logger.info(f'Get order details for: {args[0]}')
         return client.call_api_function(*args, **kwargs)
 
 
