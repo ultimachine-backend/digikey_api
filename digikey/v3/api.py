@@ -98,7 +98,7 @@ class DigikeyApiWrapper(object):
             status = kwargs.pop('status', None)
 
             func = getattr(self._api_instance, self.wrapped_function)
-            logger.debug('CALL wrapped -> {func.__qualname__}')
+            logger.debug(f'CALL wrapped -> {func.__qualname__}')
             api_response = func(*args, self.authorization, self.x_digikey_client_id, **kwargs)
             self._remaining_requests(api_response[2], api_limits)
             self._store_api_statuscode(api_response[1], status)
