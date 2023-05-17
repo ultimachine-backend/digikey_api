@@ -122,7 +122,7 @@ class TokenHandler:
         else:
             raise ValueError('Please specify the correct Digikey API version')
 
-        logger.debug('Using API V{version}')
+        logger.debug(f'Using API V{version}')
 
         a_id = a_id or os.getenv('DIGIKEY_CLIENT_ID')
         a_secret = a_secret or os.getenv('DIGIKEY_CLIENT_SECRET')
@@ -321,7 +321,8 @@ class TokenHandler:
         # Obtain new credentials using the Oauth flow if no token stored or refresh fails
         if token_json is None:
             url = self.__build_authorization_url()
-            
+        return token_json, url
+
 
     def token_server(self, token_json) -> Oauth2Token:
         filename = self.__generate_certificate()
