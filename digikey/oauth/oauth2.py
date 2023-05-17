@@ -263,8 +263,12 @@ class TokenHandler:
             httpd.stop = 0
 
             # This function will block until it receives a request
+            timeout = time.time() + 60*5   # 5 minutes from now
             while httpd.stop == 0:
                 httpd.handle_request()
+                if time.time() > timeout:
+                    logger.error("Digikey API authorization renewal timeout")
+                    break
             httpd.server_close()
 
             # Remove generated certificate
