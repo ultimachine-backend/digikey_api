@@ -83,6 +83,11 @@ swaggerCodeGen_config_all = {
         "projectName": "community-digikey-api-supplychain",
         "packageVersion": "0.1.0",
     }
+    , 'ordering': {
+        "packageName": "digikey.v3.ordering",
+        "projectName": "community-digikey-api-ordering",
+        "packageVersion": "0.1.0",
+    }
 
 }
 
@@ -110,6 +115,12 @@ digikeyAPIdef_all = {
              , apiSubGroup='supplychain'
              , apiQuery='getallproducts'
              , urlNode='646'
+             )
+    , 'ordering':
+        dict(apiGroup='ordering'
+             , apiSubGroup='ordering'
+             , apiQuery='order'
+             , urlNode='3533'
              )
 }
 
@@ -151,8 +162,22 @@ def codeGen_api(digikeyAPIdef, swaggerCodeGen_config):
     if not os.path.exists(TMP_PATH):
         logging.info('making TMP directory:  {}------------------------------------'.format(TMP_PATH))
         os.mkdir(TMP_PATH)
-    # download the SWAGGER.JSON for the required DIGIKEY API
-    swaggerSpecFile = getDigikeyAPIswaggerSpecJSON(TMP_PATH, **digikeyAPIdef)
+    
+    # Check if swagger spec file already exists (manually downloaded)
+    swaggerSpecFile = os.path.join(TMP_PATH, "digikeyAPI-{apiGroup}-swagger-spec.json".format(**digikeyAPIdef))
+    
+    if os.path.exists(swaggerSpecFile):
+        logging.info('Using existing Swagger specification file: {}'.format(swaggerSpecFile))
+        # Verify it's not an HTML file
+        with open(swaggerSpecFile, 'r') as f:
+            content = f.read(100)  # Read first 100 chars
+            if content.strip().startswith('<!DOCTYPE html') or content.strip().startswith('<html'):
+                logging.warning('Existing file appears to be HTML, attempting to download...')
+                swaggerSpecFile = getDigikeyAPIswaggerSpecJSON(TMP_PATH, **digikeyAPIdef)
+    else:
+        # download the SWAGGER.JSON for the required DIGIKEY API
+        logging.info('Downloading Swagger specification from Digikey API...')
+        swaggerSpecFile = getDigikeyAPIswaggerSpecJSON(TMP_PATH, **digikeyAPIdef)
 
     # setup the CONFIG file
     configFile_swaggerCodegen = '{projectName}-config-SwaggerCodegen.json'.format(**swaggerCodeGen_config)
@@ -195,7 +220,7 @@ def codeGen_api(digikeyAPIdef, swaggerCodeGen_config):
 
     try:
         logging.info(
-            "STARTING Code generator:{swagger_codegen_cli_version_jar} for a Swagger API created, project name: {swaggerCodeGen_config['projectName']}")
+            f"STARTING Code generator:{swagger_codegen_cli_version_jar} for a Swagger API created, project name: {swaggerCodeGen_config['projectName']} command: {codeGenRunCommand}")
         procCall = subprocess.run(codeGenRunCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # , shell=True)
         logging.info(
             "COMPLETED Code generator for a Swagger API created, project name: {swaggerCodeGen_config['projectName']}")
@@ -298,9 +323,17 @@ def copy_generated_files():
         Path(DEST_PATH).joinpath('community-digikey-api-supplychain/digikey.v3.supplychain'),
         Path(API_PATH).joinpath('supplychain'), dirs_exist_ok=True)
 
+    logging.info('Copy generated ordering files to api destination')
+    shutil.copytree(
+        Path(DEST_PATH).joinpath('community-digikey-api-ordering/digikey/v3/ordering'),
+        Path(API_PATH).joinpath('ordering'), dirs_exist_ok=True)
+    shutil.copytree(
+        Path(DEST_PATH).joinpath('community-digikey-api-ordering/digikey.v3.ordering'),
+        Path(API_PATH).joinpath('ordering'), dirs_exist_ok=True)
+
 
 # Currently supported API's
-apiGenerateList = ['product-information', 'order-support', 'batch-product-details', 'supply-chain']
+apiGenerateList = ['product-information', 'order-support', 'batch-product-details', 'supply-chain', 'ordering']
 
 # Generate Digikey API python clients
 generated = [

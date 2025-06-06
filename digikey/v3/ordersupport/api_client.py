@@ -448,7 +448,7 @@ class ApiClient(object):
                     continue
                 file_names = v if type(v) is list else [v]
                 for n in file_names:
-                    with open(str(n), 'rb') as f:
+                    with open(n, 'rb') as f:
                         filename = os.path.basename(f.name)
                         filedata = f.read()
                         mimetype = (mimetypes.guess_type(filename)[0] or
@@ -533,7 +533,7 @@ class ApiClient(object):
                                  content_disposition).group(1)
             path = os.path.join(os.path.dirname(path), filename)
 
-        with open(str(path), "wb") as f:
+        with open(path, "wb") as f:
             f.write(response.data)
 
         return path
