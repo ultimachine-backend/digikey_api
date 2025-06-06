@@ -113,7 +113,7 @@ def keyword_search(*args, **kwargs) -> KeywordSearchResponse:
     client = DigikeyApiWrapper('keyword_search_with_http_info', digikey.v3.productinformation)
 
     if 'body' in kwargs and type(kwargs['body']) == KeywordSearchRequest:
-        logger.info('Search for: {kwargs["body"].keywords}')
+        logger.info(f'Search for: {kwargs["body"].keywords}')
         logger.debug('CALL -> keyword_search')
         return client.call_api_function(*args, **kwargs)
     else:
@@ -148,7 +148,7 @@ def manufacturer_product_details(*args, **kwargs) -> KeywordSearchResponse:
     client = DigikeyApiWrapper('manufacturer_product_details_with_http_info', digikey.v3.productinformation)
 
     if 'body' in kwargs and type(kwargs['body']) == ManufacturerProductDetailsRequest:
-        logger.info('Search for: {kwargs["body"].manufacturer_product}')
+        logger.info(f'Search for: {kwargs["body"].manufacturer_product}')
         return client.call_api_function(*args, **kwargs)
     else:
         raise DigikeyError('Please provide a valid ManufacturerProductDetailsRequest argument')
