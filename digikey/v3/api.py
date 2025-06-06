@@ -105,7 +105,7 @@ class DigikeyApiWrapper(object):
 
             return api_response[0]
         except ApiException as e:
-            logger.error('Exception when calling {self.wrapped_function}: {e}')
+            logger.error(f'Exception when calling {self.wrapped_function}: {e}')
             self._store_api_statuscode(e.status, status)
 
 
@@ -197,7 +197,7 @@ def batch_product_details(*args, **kwargs) -> BatchProductDetailsResponse:
     client = DigikeyApiWrapper('batch_product_details_with_http_info', digikey.v3.batchproductdetails)
 
     if 'body' in kwargs and type(kwargs['body']) == BatchProductDetailsRequest:
-        logger.info('Batch product search: {kwargs["body"].products}')
+        logger.info(f'Batch product search: {kwargs["body"].products}')
         logger.debug('CALL -> batch_product_details')
         return client.call_api_function(*args, **kwargs)
     else:
