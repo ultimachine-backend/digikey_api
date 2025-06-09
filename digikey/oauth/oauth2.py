@@ -119,10 +119,17 @@ class TokenHandler:
             else:
                 self.auth_url = AUTH_URL_V3_PROD
                 self.token_url = TOKEN_URL_V3_PROD
+        elif version == 4:
+            if sandbox:
+                self.auth_url = AUTH_URL_V3_SB
+                self.token_url = TOKEN_URL_V3_SB
+            else:
+                self.auth_url = AUTH_URL_V3_PROD
+                self.token_url = TOKEN_URL_V3_PROD
         else:
             raise ValueError('Please specify the correct Digikey API version')
 
-        logger.debug(f'Using API V{version}')
+        logger.debug('Using API V{version}')
 
         a_id = a_id or os.getenv('DIGIKEY_CLIENT_ID')
         a_secret = a_secret or os.getenv('DIGIKEY_CLIENT_SECRET')
@@ -263,11 +270,8 @@ class TokenHandler:
             httpd.stop = 0
 
             # This function will block until it receives a request
-            timeout = time.time() + 60*5   # 5 minutes from now
-            while httpd.stop == 0 and time.time() < timeout:
+            while httpd.stop == 0:
                 httpd.handle_request()
-            if time.time() > timeout:
-                logger.error("Digikey API authorization renewal timeout")
             httpd.server_close()
 
             # Remove generated certificate
@@ -283,77 +287,6 @@ class TokenHandler:
 
             # Save the newly obtained credentials to the filesystem
             self.save(token_json)
-
-        return Oauth2Token(token_json)
-
-
-    def get_access_token_url(self):
-        """
-         Fetches the access key using an HTTP server to handle oAuth
-         requests
-            Args:
-                appId:      The assigned App ID
-                appSecret:  The assigned App Secret
-        """
-
-        # Check if a token already exists on the storage
-        token_json = None
-        try:
-            with open(str(self._token_storage_path), 'r') as f:
-                token_json = json.load(f)
-        except (EnvironmentError, JSONDecodeError):
-            logger.warning('Oauth2 token storage does not exist or malformed, creating new.')
-
-        token = None
-        if token_json is not None:
-            token = Oauth2Token(token_json)
-
-        # Try to refresh the credentials with the stores refresh token
-        if token is not None and token.expired():
-            try:
-                logger.debug('REFRESH - Current token is stale, refresh using: {token.refresh_token}')
-                token_json = self.__refresh_token(token.refresh_token)
-                self.save(token_json)
-            except DigikeyOauthException:
-                logger.error('REFRESH - Failed to use refresh token, starting new authorization flow.')
-                token_json = None
-        url = None
-        # Obtain new credentials using the Oauth flow if no token stored or refresh fails
-        if token_json is None:
-            url = self.__build_authorization_url()
-        return token_json, url
-
-
-    def token_server(self, token_json) -> Oauth2Token:
-        filename = self.__generate_certificate()
-        httpd = HTTPServer(
-                ('localhost', PORT),
-                lambda request, address, server: HTTPServerHandler(
-                    request, address, server, self._id, self._secret))
-        httpd.socket = ssl.wrap_socket(httpd.socket, certfile=str(Path(filename)), server_side=True)
-        httpd.stop = 0
-
-        # This function will block until it receives a request
-        timeout = time.time() + 60*5   # 5 minutes from now
-        while httpd.stop == 0 and time.time() < timeout:
-            httpd.handle_request()
-        if time.time() > timeout:
-            logger.error("Digikey API authorization renewal timeout")
-        httpd.server_close()
-
-        # Remove generated certificate
-        try:
-            fn = join(os.getcwd(), filename)
-            os.remove(fn)
-            os.remove(str(self._ca_cert))
-        except OSError as e:
-            logger.error('Cannot remove temporary certificates: {}'.format(e))
-
-        # Get the acccess token from the auth code
-        token_json = self.__exchange_for_token(httpd.auth_code)
-
-        # Save the newly obtained credentials to the filesystem
-        self.save(token_json)
 
         return Oauth2Token(token_json)
 

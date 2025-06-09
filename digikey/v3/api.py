@@ -3,7 +3,7 @@ import logging
 from distutils.util import strtobool
 import digikey.oauth.oauth2
 from digikey.exceptions import DigikeyError
-from digikey.v3.productinformation import (KeywordSearchRequest, KeywordSearchResponse, ProductDetails, DigiReelPricingDto as DigiReelPricing,
+from digikey.v3.productinformation import (KeywordSearchRequest, KeywordSearchResponse, ProductDetails, DigiReelPricing,
                                            ManufacturerProductDetailsRequest)
 from digikey.v3.productinformation.rest import ApiException
 from digikey.v3.ordersupport import (OrderStatusResponse, SalesOrderHistoryItem)

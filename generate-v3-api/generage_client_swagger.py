@@ -67,6 +67,11 @@ swaggerCodeGen_config_all = {
         "packageName": "digikey.v3.productinformation",
         "projectName": "community-digikey-api-productinformation",
         "packageVersion": "0.1.0",
+    },
+    'product-information-v4': {
+        "packageName": "digikey.v4.productinformation", 
+        "projectName": "community-digikey-api-productinformation-v4",
+        "packageVersion": "0.1.0",
     }
     , 'order-support': {
         "packageName": "digikey.v3.ordersupport",
@@ -98,6 +103,12 @@ digikeyAPIdef_all = {
              , apiQuery='productdetails'
              , urlNode='432'
              )
+    , 'product-information-v4': dict(
+        apiGroup='product-information-v4',
+        apiSubGroup='productsearch',
+        apiQuery='keywordsearch', 
+        urlNode='2357'
+    )
     , 'order-support':
         dict(apiGroup='order-support'
              , apiSubGroup='orderdetails'
@@ -295,11 +306,12 @@ def copytree(src, dst, symlinks=False, ignore=None):
 
 def copy_generated_files():
     logging.info('----- COPY generated files')
-    logging.info('Copy generated productinformation files to api destination')
-    shutil.copytree(Path(DEST_PATH).joinpath('community-digikey-api-productinformation/digikey/v3/productinformation'),
-                    Path(API_PATH).joinpath('productinformation'), dirs_exist_ok=True)
-    shutil.copytree(Path(DEST_PATH).joinpath('community-digikey-api-productinformation/digikey.v3.productinformation'),
-                    Path(API_PATH).joinpath('productinformation'), dirs_exist_ok=True)
+    logging.info('Copy generated productinformation v4 files to api destination')
+    shutil.copytree(
+        Path(DEST_PATH).joinpath('community-digikey-api-productinformation-v4/digikey/v4/productinformation'),
+        Path(API_PATH.replace('v3', 'v4')).joinpath('productinformation'), 
+        dirs_exist_ok=True
+    )
 
     logging.info('Copy generated ordersupport files to api destination')
     shutil.copytree(Path(DEST_PATH).joinpath('community-digikey-api-ordersupport/digikey/v3/ordersupport'),
@@ -333,7 +345,13 @@ def copy_generated_files():
 
 
 # Currently supported API's
-apiGenerateList = ['product-information', 'order-support', 'batch-product-details', 'supply-chain', 'ordering']
+apiGenerateList = [
+    'product-information-v4',
+    'order-support', 
+    'batch-product-details', 
+    'supply-chain', 
+    'ordering'
+]
 
 # Generate Digikey API python clients
 generated = [

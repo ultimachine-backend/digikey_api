@@ -23,9 +23,9 @@ import tempfile
 import six
 from six.moves.urllib.parse import quote
 
-from digikey.v3.productinformation.configuration import Configuration
-import digikey.v3.productinformation.models
-from digikey.v3.productinformation import rest
+from digikey.v4.productinformation.configuration import Configuration
+import digikey.v4.productinformation.models
+from digikey.v4.productinformation import rest
 
 
 class ApiClient(object):
@@ -111,6 +111,7 @@ class ApiClient(object):
         # header parameters
         header_params = header_params or {}
         header_params.update(self.default_headers)
+        header_params.update(config.default_headers)
         if self.cookie:
             header_params['Cookie'] = self.cookie
         if header_params:
@@ -266,7 +267,7 @@ class ApiClient(object):
             if klass in self.NATIVE_TYPES_MAPPING:
                 klass = self.NATIVE_TYPES_MAPPING[klass]
             else:
-                klass = getattr(digikey.v3.productinformation.models, klass)
+                klass = getattr(digikey.v4.productinformation, klass)
 
         if klass in self.PRIMITIVE_TYPES:
             return self.__deserialize_primitive(data, klass)

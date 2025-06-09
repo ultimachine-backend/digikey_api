@@ -28,7 +28,7 @@ from digikey.v3.productinformation.models.associated_product import AssociatedPr
 from digikey.v3.productinformation.models.basic_product import BasicProduct
 from digikey.v3.productinformation.models.categories_response import CategoriesResponse
 from digikey.v3.productinformation.models.category import Category
-from digikey.v3.productinformation.models.digi_reel_pricing_dto import DigiReelPricingDto
+from digikey.v3.productinformation.models.digi_reel_pricing import DigiReelPricing
 from digikey.v3.productinformation.models.filters import Filters
 from digikey.v3.productinformation.models.iso_search_locale import IsoSearchLocale
 from digikey.v3.productinformation.models.keyword_search_request import KeywordSearchRequest
