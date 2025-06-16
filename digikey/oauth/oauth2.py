@@ -269,8 +269,9 @@ class TokenHandler:
             httpd.socket = ssl.wrap_socket(httpd.socket, certfile=str(Path(filename)), server_side=True)
             httpd.stop = 0
 
-            # This function will block until it receives a request
-            while httpd.stop == 0:
+            # This function will block until it receives a request or timeout
+            timeout = time.time() + 60 * 5  # 5 minutes from now
+            while time.time() < timeout and httpd.stop == 0:
                 httpd.handle_request()
             httpd.server_close()
 

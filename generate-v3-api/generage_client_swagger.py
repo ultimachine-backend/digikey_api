@@ -93,6 +93,11 @@ swaggerCodeGen_config_all = {
         "projectName": "community-digikey-api-ordering",
         "packageVersion": "0.1.0",
     }
+    , 'order-status-v4': {
+        "packageName": "digikey.v4.orderstatus",
+        "projectName": "community-digikey-api-orderstatus-v4",
+        "packageVersion": "0.1.0",
+    }
 
 }
 
@@ -133,6 +138,12 @@ digikeyAPIdef_all = {
              , apiQuery='order'
              , urlNode='3533'
              )
+    , 'order-status-v4': dict(
+            apiGroup='order-status-v4',
+            apiSubGroup='orderstatus',
+            apiQuery='orderstatus',
+            urlNode='2288'  # You'll need to find the correct node number
+            )
 }
 
 
@@ -343,6 +354,12 @@ def copy_generated_files():
         Path(DEST_PATH).joinpath('community-digikey-api-ordering/digikey.v3.ordering'),
         Path(API_PATH).joinpath('ordering'), dirs_exist_ok=True)
 
+    logging.info('Copy generated order-status-v4 files to api destination')
+    shutil.copytree(
+        Path(DEST_PATH).joinpath('community-digikey-api-orderstatus-v4/digikey/v4/orderstatus'),
+        Path(API_PATH.replace('v3', 'v4')).joinpath('orderstatus'), 
+        dirs_exist_ok=True
+    )
 
 # Currently supported API's
 apiGenerateList = [
@@ -350,7 +367,8 @@ apiGenerateList = [
     'order-support', 
     'batch-product-details', 
     'supply-chain', 
-    'ordering'
+    'ordering',
+    'order-status-v4' 
 ]
 
 # Generate Digikey API python clients

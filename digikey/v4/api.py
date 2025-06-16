@@ -5,6 +5,8 @@ import digikey.oauth.oauth2
 from digikey.exceptions import DigikeyError
 from digikey.v4.productinformation import (KeywordRequest, KeywordResponse, ProductDetails, DigiReelPricing)
 from digikey.v4.productinformation.rest import ApiException
+from digikey.v4.orderstatus import (OrderResponse, SalesOrder)
+from digikey.v4.orderstatus import OrderHistoryApi
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +18,12 @@ class DigikeyApiV4Wrapper(object):
         # V4 API configuration
         apinames = {
             digikey.v4.productinformation: 'products',
+            digikey.v4.orderstatus: 'orderstatus',
         }
 
         apiclasses = {
             digikey.v4.productinformation: digikey.v4.productinformation.ProductSearchApi,
+            digikey.v4.orderstatus: digikey.v4.orderstatus.OrderHistoryApi,
         }
 
         apiname = apinames[module]
@@ -45,12 +49,18 @@ class DigikeyApiV4Wrapper(object):
         configuration.default_headers['Authorization'] = f'Bearer {self._digikeyApiToken.access_token}'
 
         # V4 API endpoint - check what the generated API expects
-        configuration.host = 'https://api.digikey.com/products/v4'
+        if module == digikey.v4.productinformation:
+            configuration.host = 'https://api.digikey.com/products/v4'
+        elif module == digikey.v4.orderstatus:
+            configuration.host = 'https://api.digikey.com/orderstatus/v4'
         
         # Use sandbox API if configured
         try:
             if bool(strtobool(os.getenv('DIGIKEY_CLIENT_SANDBOX'))):
-                configuration.host = 'https://sandbox-api.digikey.com/products/v4'
+                if module == digikey.v4.productinformation:
+                    configuration.host = 'https://sandbox-api.digikey.com/products/v4'
+                elif module == digikey.v4.orderstatus:
+                    configuration.host = 'https://sandbox-api.digikey.com/orderstatus/v4'
                 self.sandbox = True
         except (ValueError, AttributeError):
             pass
@@ -163,3 +173,21 @@ def product_pricing(*args, **kwargs):
     if len(args):
         logger.info(f'V4 Get product pricing for: {args[0]}')
         return client.call_api_function(*args, **kwargs)
+
+def retrieve_sales_order(*args, **kwargs) -> SalesOrder:
+    """V4 function to retrieve a specific sales order by ID"""
+    client = DigikeyApiV4Wrapper('retrieve_sales_order_with_http_info', digikey.v4.orderstatus)
+    
+    if len(args):
+        logger.info(f'V4 Retrieve sales order for ID: {args[0]}')
+        return client.call_api_function(*args, **kwargs)
+    else:
+        raise DigikeyError('Please provide a valid sales order ID')
+
+
+def search_orders(*args, **kwargs) -> OrderResponse:
+    """V4 function to search orders within a date range"""
+    client = DigikeyApiV4Wrapper('search_orders_with_http_info', digikey.v4.orderstatus)
+    
+    logger.info('V4 Search orders with specified criteria')
+    return client.call_api_function(*args, **kwargs)
