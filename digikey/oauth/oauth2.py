@@ -19,6 +19,7 @@ from digikey.exceptions import DigikeyOauthException
 
 CA_CERT = 'digikey-api.pem'
 TOKEN_STORAGE = 'token_storage.json'
+TOKEN_STORAGE_SANDBOX = 'token_storage_sandbox.json'
 
 AUTH_URL_V2 = 'https://sso.digikey.com/as/authorization.oauth2'
 TOKEN_URL_V2 = 'https://sso.digikey.com/as/token.oauth2'
@@ -131,6 +132,9 @@ class TokenHandler:
 
         logger.debug('Using API V{version}')
 
+        if sandbox:
+            a_id = a_id or os.getenv('DIGIKEY_SANDBOX_CLIENT_ID') or os.getenv('DIGIKEY_CLIENT_ID')
+            a_secret = a_secret or os.getenv('DIGIKEY_SANDBOX_CLIENT_SECRET') or os.getenv('DIGIKEY_CLIENT_SECRET')
         a_id = a_id or os.getenv('DIGIKEY_CLIENT_ID')
         a_secret = a_secret or os.getenv('DIGIKEY_CLIENT_SECRET')
         if not a_id or not a_secret:
@@ -151,7 +155,8 @@ class TokenHandler:
         self._id = a_id
         self._secret = a_secret
         self._storage_path = Path(a_token_storage_path)
-        self._token_storage_path = self._storage_path.joinpath(TOKEN_STORAGE)
+        self._token_storage_path = self._storage_path.joinpath(
+            TOKEN_STORAGE_SANDBOX if sandbox else TOKEN_STORAGE)
         self._ca_cert = self._storage_path.joinpath(CA_CERT)
 
     def __generate_certificate(self):
