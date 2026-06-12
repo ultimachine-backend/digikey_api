@@ -9,26 +9,28 @@ from digikey.v3.productinformation.rest import ApiException
 from digikey.v3.ordersupport import (OrderStatusResponse, SalesOrderHistoryItem)
 from digikey.v3.batchproductdetails import (BatchProductDetailsRequest, BatchProductDetailsResponse)
 from digikey.v3.supplychain import (BondedInventoryProductResponse)
+from digikey.v3.ordering import (OrderRequest, OrderResponse)
+import digikey.v3.ordering
 
 logger = logging.getLogger(__name__)
 
 
 class DigikeyApiWrapper(object):
-    def __init__(self, wrapped_function, module):
-        self.sandbox = False
-
+    def __init__(self, wrapped_function, module, sandbox=None):
         apinames = {
             digikey.v3.productinformation: 'Search',
             digikey.v3.ordersupport: 'OrderDetails',
             digikey.v3.batchproductdetails: 'BatchSearch',
-            digikey.v3.supplychain: 'SupplyChain'
+            digikey.v3.supplychain: 'SupplyChain',
+            digikey.v3.ordering: 'Ordering'
         }
 
         apiclasses = {
             digikey.v3.productinformation: digikey.v3.productinformation.PartSearchApi,
             digikey.v3.ordersupport: digikey.v3.ordersupport.OrderDetailsApi,
             digikey.v3.batchproductdetails: digikey.v3.batchproductdetails.BatchSearchApi,
-            digikey.v3.supplychain: digikey.v3.supplychain.BondedInventoryApi
+            digikey.v3.supplychain: digikey.v3.supplychain.BondedInventoryApi,
+            digikey.v3.ordering: digikey.v3.ordering.OrderingApi
         }
 
         apiname = apinames[module]
@@ -42,14 +44,17 @@ class DigikeyApiWrapper(object):
         if os.getenv('DIGIKEY_CLIENT_ID') is None or os.getenv('DIGIKEY_CLIENT_SECRET') is None:
             raise DigikeyError('Please provide a valid DIGIKEY_CLIENT_ID and DIGIKEY_CLIENT_SECRET in your env setup')
 
-        # Use normal API by default, if DIGIKEY_CLIENT_SANDBOX is True use sandbox API
+        # Use normal API by default; sandbox if DIGIKEY_CLIENT_SANDBOX is True,
+        # or per-call via the sandbox argument (overrides the env var when not None).
         #configuration.host = 'https://api.digikey.com/' + apiname + '/v3'
+        env_sandbox = False
         try:
-            if bool(strtobool(os.getenv('DIGIKEY_CLIENT_SANDBOX'))):
-                configuration.host = 'https://sandbox-api.digikey.com/' + apiname + '/v3'
-                self.sandbox = True
+            env_sandbox = bool(strtobool(os.getenv('DIGIKEY_CLIENT_SANDBOX')))
         except (ValueError, AttributeError):
             pass
+        self.sandbox = env_sandbox if sandbox is None else sandbox
+        if self.sandbox:
+            configuration.host = 'https://sandbox-api.digikey.com/' + apiname + '/v3'
 
         # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
         # configuration.api_key_prefix['X-DIGIKEY-Client-Id'] = 'Bearer'
@@ -192,6 +197,23 @@ def bonded_inventory(*args, **kwargs) -> [BondedInventoryProductResponse]:
     client = DigikeyApiWrapper('get_all_products_with_http_info', digikey.v3.supplychain)
     logger.info('Getting bonded items list')
     return client.call_api_function(*args, **kwargs)
+
+# Note: call_api_function's `except ApiException` only catches the
+# productinformation ApiException class. The ordering client raises
+# digikey.v3.ordering.rest.ApiException (a different class), so ordering
+# errors propagate to the caller intentionally — the caller parses the
+# error body. Do not widen the except clause to swallow them.
+def place_order(*args, **kwargs) -> OrderResponse:
+    sandbox = kwargs.pop('sandbox', None)
+    client = DigikeyApiWrapper('order_with_http_info', digikey.v3.ordering, sandbox=sandbox)
+
+    if 'body' in kwargs and type(kwargs['body']) == OrderRequest:
+        logger.info(f'Placing DigiKey order for PO: {kwargs["body"].purchase_order_number}'
+                    + (' [SANDBOX]' if client.sandbox else ''))
+        return client.call_api_function(*args, **kwargs)
+    else:
+        raise DigikeyError('Please provide a valid OrderRequest argument')
+
 
 def batch_product_details(*args, **kwargs) -> BatchProductDetailsResponse:
     client = DigikeyApiWrapper('batch_product_details_with_http_info', digikey.v3.batchproductdetails)
