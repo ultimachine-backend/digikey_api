@@ -38,7 +38,6 @@ class DigikeyApiWrapper(object):
 
         # Configure API key authorization: apiKeySecurity
         configuration = module.Configuration()
-        configuration.api_key['X-DIGIKEY-Client-Id'] = os.getenv('DIGIKEY_CLIENT_ID')
 
         # Return quietly if no clientid has been set to prevent errors when importing the module
         if os.getenv('DIGIKEY_CLIENT_ID') is None or os.getenv('DIGIKEY_CLIENT_SECRET') is None:
@@ -60,15 +59,17 @@ class DigikeyApiWrapper(object):
         # configuration.api_key_prefix['X-DIGIKEY-Client-Id'] = 'Bearer'
 
         # Configure OAuth2 access token for authorization: oauth2AccessCodeSecurity
-        self._digikeyApiToken = digikey.oauth.oauth2.TokenHandler(version=3, sandbox=self.sandbox).get_access_token()
+        token_handler = digikey.oauth.oauth2.TokenHandler(version=3, sandbox=self.sandbox)
+        self._digikeyApiToken = token_handler.get_access_token()
         configuration.access_token = self._digikeyApiToken.access_token
+        configuration.api_key['X-DIGIKEY-Client-Id'] = token_handler.client_id
 
         # create an instance of the API class
         self._api_instance = apiclass(module.ApiClient(configuration))
 
         # Populate reused ids
         self.authorization = self._digikeyApiToken.get_authorization()
-        self.x_digikey_client_id = os.getenv('DIGIKEY_CLIENT_ID')
+        self.x_digikey_client_id = token_handler.client_id
 
         self.wrapped_function = wrapped_function
 

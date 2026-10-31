@@ -159,6 +159,12 @@ class TokenHandler:
             TOKEN_STORAGE_SANDBOX if sandbox else TOKEN_STORAGE)
         self._ca_cert = self._storage_path.joinpath(CA_CERT)
 
+    @property
+    def client_id(self) -> str:
+        """The client id this handler resolved, which the API headers must
+        use: a sandbox token is only valid with the sandbox client id."""
+        return self._id
+
     def __generate_certificate(self):
         ca = CertificateAuthority('Python digikey-api CA', str(self._ca_cert), cert_cache=str(self._storage_path))
         return ca.cert_for_host('localhost')
@@ -265,6 +271,12 @@ class TokenHandler:
 
         # Obtain new credentials using the Oauth flow if no token stored or refresh fails
         if token_json is None:
+            # A server has no browser to open, and the HTTPServer below would
+            # block this thread for up to 5 minutes.
+            if os.getenv('DIGIKEY_NONINTERACTIVE') == '1':
+                raise DigikeyOauthException(
+                    'No usable DigiKey token and DIGIKEY_NONINTERACTIVE=1: '
+                    'authorize through the web flow first.')
             open_new(self.__build_authorization_url())
             filename = self.__generate_certificate()
             httpd = HTTPServer(

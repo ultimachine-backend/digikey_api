@@ -152,6 +152,9 @@ class RESTClientObject(object):
 
         try:
             # For `POST`, `PUT`, `PATCH`, `OPTIONS`, `DELETE`
+            # retries=False on every write: POST /Orders places a real order,
+            # and urllib3's default Retry(3) re-sends after an SSLError (its
+            # "other" bucket has no method check), which would order twice.
             if method in ['POST', 'PUT', 'PATCH', 'OPTIONS', 'DELETE']:
                 if query_params:
                     url += '?' + urlencode(query_params)
@@ -164,6 +167,7 @@ class RESTClientObject(object):
                         body=request_body,
                         preload_content=_preload_content,
                         timeout=timeout,
+                        retries=False,
                         headers=headers)
                 elif headers['Content-Type'] == 'application/x-www-form-urlencoded':  # noqa: E501
                     r = self.pool_manager.request(
@@ -172,6 +176,7 @@ class RESTClientObject(object):
                         encode_multipart=False,
                         preload_content=_preload_content,
                         timeout=timeout,
+                        retries=False,
                         headers=headers)
                 elif headers['Content-Type'] == 'multipart/form-data':
                     # must del headers['Content-Type'], or the correct
@@ -184,6 +189,7 @@ class RESTClientObject(object):
                         encode_multipart=True,
                         preload_content=_preload_content,
                         timeout=timeout,
+                        retries=False,
                         headers=headers)
                 # Pass a `string` parameter directly in the body to support
                 # other content types than Json when `body` argument is
@@ -195,6 +201,7 @@ class RESTClientObject(object):
                         body=request_body,
                         preload_content=_preload_content,
                         timeout=timeout,
+                        retries=False,
                         headers=headers)
                 else:
                     # Cannot generate the request from given parameters
